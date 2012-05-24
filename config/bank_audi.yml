@@ -1,0 +1,4 @@
+secret_code: XXXXXX
+access_code: XXXXXX
+merchant: XXXXXX
+url: 'https://gw1.audicards.com/TPGWeb/payment/prepayment.action'
