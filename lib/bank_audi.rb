@@ -96,7 +96,7 @@ module BankAudi
       end
 
       def valid_vpc_txn_response_code?
-        !(vpc_txn_response_code == '7' || vpc_txn_response_code.blank?)
+        vpc_txn_response_code == '0'
       end
 
       def sort_keys(attributes)

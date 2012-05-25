@@ -83,6 +83,13 @@ describe BankAudi do
       @response = BankAudi::Response.new
     end
 
+    def valid(response)
+      response.attributes = { :access_code => 'XXXXXX', :amount => 100, :merchant_txn_ref => 'merchant-txn-ref',
+        :merchant => 'XXXXXX', :order_info => 'order-info', :return_url => 'http://www.google.com',
+        :vpc_secure_hash => 'B2384E5659611034CFFC95842C66A4BA', :vpc_txn_response_code => '0' }
+      response
+    end
+
     it 'should initialize with default attributes' do
       [:secret_code].each do |attribute|
         @response.send(attribute).should_not be_blank
@@ -96,14 +103,19 @@ describe BankAudi do
     end
 
     it 'should be valid' do
-      @response.attributes = { :access_code => 'XXXXXX', :amount => 100, :merchant_txn_ref => 'merchant-txn-ref',
-        :merchant => 'XXXXXX', :order_info => 'order-info', :return_url => 'http://www.google.com',
-        :vpc_secure_hash => '82688C2F8F74B120E20C05CE7E4DC4F7', :vpc_txn_response_code => 'M' }
-      @response.should be_valid
+      valid(@response).should be_valid
     end
 
     it 'should be invalid' do
       @response.should_not be_valid
+
+      response = valid(@response)
+      response.attributes[:vpc_txn_response_code] = 'M'
+      response.should_not be_valid
+
+      response = valid(@response)
+      response.attributes[:amount] = 200
+      response.should_not be_valid
     end
   end
 
