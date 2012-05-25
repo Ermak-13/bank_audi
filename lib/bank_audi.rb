@@ -77,18 +77,25 @@ module BankAudi
       valid_vpc_txn_response_code? && valid_vpc_secure_hash?
     end
 
+    def vpc_secure_hash
+      @attributes[:vpc_secure_hash] || @attributes[:vpc_SecureHash]
+    end
+
+    def vpc_txn_response_code
+      @attributes[:vpc_txn_response_code] || @attributes[:vpc_TxnResponseCode]
+    end
+
     private
       def valid_vpc_secure_hash?
-        params = @attributes.select { |k,v| k != :vpc_secure_hash }
+        params = @attributes.select { |k,v| v != vpc_secure_hash }
         vpc_secure_hash_params = secret_code
         sort_keys(params).each do |key|
           vpc_secure_hash_params += @attributes[key].to_s
         end
-        Digest::MD5.hexdigest(vpc_secure_hash_params).upcase == @attributes[:vpc_secure_hash]
+        Digest::MD5.hexdigest(vpc_secure_hash_params).upcase == vpc_secure_hash
       end
 
       def valid_vpc_txn_response_code?
-        vpc_txn_response_code = @attributes[:vpc_txn_response_code]
         !(vpc_txn_response_code == '7' || vpc_txn_response_code.blank?)
       end
 
