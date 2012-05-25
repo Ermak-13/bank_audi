@@ -7,7 +7,7 @@ module BankAudi
   OPTIONS = YAML.load_file('config/bank_audi.yml')
 
   class Request
-    attr_reader :secret_code, :access_code, :merchant, :url
+    attr_reader :secret_code, :access_code, :merchant, :url, :errors
     attr_accessor :merchant_txn_ref, :order_info, :amount, :return_url
     alias :merchant_id :merchant
 
@@ -19,8 +19,12 @@ module BankAudi
     end
 
     def valid?
+      @errors = {}
       attributes_names.each do |attribute|
-        return false if self.send(attribute).blank?
+        if self.send(attribute).blank?
+          @errors[attribute] = "can't be blank"
+          return false
+        end
       end
     end
 
@@ -66,7 +70,7 @@ module BankAudi
   end
 
   class Response
-    attr_reader :secret_code
+    attr_reader :secret_code, :errors
     attr_accessor :attributes
 
     def initialize(options = {})
@@ -74,6 +78,7 @@ module BankAudi
     end
 
     def valid?
+      @errors = {}
       valid_vpc_txn_response_code? && valid_vpc_secure_hash?
     end
 
@@ -92,11 +97,21 @@ module BankAudi
         sort_keys(params).each do |key|
           vpc_secure_hash_params += @attributes[key].to_s
         end
-        Digest::MD5.hexdigest(vpc_secure_hash_params).upcase == vpc_secure_hash
+        if Digest::MD5.hexdigest(vpc_secure_hash_params).upcase == vpc_secure_hash
+          true
+        else
+          @errors[:vpc_secure_hash] = 'invalid'
+          false
+        end
       end
 
       def valid_vpc_txn_response_code?
-        vpc_txn_response_code == '0'
+        if vpc_txn_response_code == '0'
+          true
+        else
+          @errors[:vpc_txn_response_code] = "bad code =  #{vpc_txn_response_code}"
+          false
+        end
       end
 
       def sort_keys(attributes)

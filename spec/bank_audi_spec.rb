@@ -45,6 +45,13 @@ describe BankAudi do
       end
     end
 
+    it 'should return errors (method errors)' do
+      request = valid(@request)
+      request.amount = nil
+      request.should_not be_valid
+      request.errors.first.should_not be_blank
+    end
+
     it 'should return full url' do
       url = valid(@request).full_url
       params = CGI::parse(url)
@@ -116,6 +123,13 @@ describe BankAudi do
       response = valid(@response)
       response.attributes[:amount] = 200
       response.should_not be_valid
+    end
+
+    it 'should return errors (method errors)' do
+      response = valid(@response)
+      response.attributes[:vpc_txn_response_code] = 'Y'
+      response.should_not be_valid
+      response.errors.first.should_not be_blank
     end
   end
 
