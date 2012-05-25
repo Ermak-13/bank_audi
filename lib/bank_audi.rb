@@ -6,6 +6,7 @@ require 'cgi'
 module BankAudi
   OPTIONS = YAML.load_file('config/bank_audi.yml')
 
+
   class Request
     attr_reader :secret_code, :access_code, :merchant, :url
     attr_accessor :merchant_txn_ref, :order_info, :amount, :return_url
@@ -65,6 +66,31 @@ module BankAudi
       end
   end
 
-  class Responce
+  class Response
+    attr_reader :secret_code
+    attr_accessor :attributes
+
+    def initialize(options = {})
+      @secret_code, @attributes = OPTIONS['secret_code'], options
+    end
+
+    def valid?
+      valid_vpc_txn_response_code? && valid_vpc_secure_hash?
+    end
+
+    private
+      def valid_vpc_secure_hash?
+        params = @attributes.select { |k,v| k != :vpc_secure_hash }
+        vpc_secure_hash_params = secret_code
+        params.keys.each do |key|
+          vpc_secure_hash_params += @attributes[key].to_s
+        end
+        Digest::MD5.hexdigest(vpc_secure_hash_params).upcase == @attributes[:vpc_secure_hash]
+      end
+
+      def valid_vpc_txn_response_code?
+        vpc_txn_response_code = @attributes[:vpc_txn_response_code]
+        !(vpc_txn_response_code == '7' || vpc_txn_response_code.blank?)
+      end
   end
 end

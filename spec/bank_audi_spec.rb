@@ -76,4 +76,35 @@ describe BankAudi do
       )
     end
   end
+
+  describe 'Responce' do
+
+    before :each do
+      @response = BankAudi::Response.new
+    end
+
+    it 'should initialize with default attributes' do
+      [:secret_code].each do |attribute|
+        @response.send(attribute).should_not be_blank
+      end
+    end
+
+    it 'should initialize with options' do
+      response = BankAudi::Response.new :some_attribute => 'some-attribute'
+      response.attributes.should_not be_blank
+      response.attributes.should eq({ :some_attribute => 'some-attribute' })
+    end
+
+    it 'should be valid' do
+      @response.attributes = { :access_code => 'XXXXXX', :amount => 100, :merchant_txn_ref => 'merchant-txn-ref',
+        :merchant => 'XXXXXX', :order_info => 'order-info', :return_url => 'http://www.google.com',
+        :vpc_secure_hash => '82688C2F8F74B120E20C05CE7E4DC4F7', :vpc_txn_response_code => 'M' }
+      @response.should be_valid
+    end
+
+    it 'should be invalid' do
+      @response.should_not be_valid
+    end
+  end
+
 end
