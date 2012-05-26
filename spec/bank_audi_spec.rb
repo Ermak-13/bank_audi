@@ -106,7 +106,7 @@ describe BankAudi do
     it 'should initialize with options' do
       response = BankAudi::Response.new :some_attribute => 'some-attribute'
       response.attributes.should_not be_blank
-      response.attributes.should eq({ :some_attribute => 'some-attribute' })
+      response.attributes.should eq({ 'some_attribute' => 'some-attribute' })
     end
 
     it 'should be valid' do
@@ -130,6 +130,12 @@ describe BankAudi do
       response.attributes[:vpc_txn_response_code] = 'Y'
       response.should_not be_valid
       response.errors.first.should_not be_blank
+    end
+
+    it 'should return value by different key type (string or symbol)' do
+      response = valid(@response)
+      response.attributes['vpc_txn_response_code'].should_not be_blank
+      response.attributes[:vpc_txn_response_code].should_not be_blank
     end
   end
 

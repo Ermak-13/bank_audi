@@ -74,7 +74,11 @@ module BankAudi
     attr_accessor :attributes
 
     def initialize(options = {})
-      @secret_code, @attributes = OPTIONS['secret_code'], options
+      @secret_code, @attributes = OPTIONS['secret_code'], HashWithIndifferentAccess.new(options)
+    end
+
+    def attributes=(options = {})
+      @attributes = HashWithIndifferentAccess.new(options)
     end
 
     def valid?
