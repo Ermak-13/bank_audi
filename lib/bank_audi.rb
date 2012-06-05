@@ -87,7 +87,7 @@ module BankAudi
     end
 
     def vpc_secure_hash
-      @attributes[:vpc_secure_hash] || @attributes[:vpc_SecureHash]
+      (@attributes[:vpc_secure_hash] || @attributes[:vpc_SecureHash]).upcase
     end
 
     def vpc_txn_response_code
