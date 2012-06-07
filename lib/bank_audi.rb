@@ -98,7 +98,7 @@ module BankAudi
       def valid_vpc_secure_hash?
         params = @attributes.select { |k,v| v != vpc_secure_hash }
         vpc_secure_hash_params = secret_code
-        sort_keys(params).each do |key|
+        sort_keys(params.keys).each do |key|
           vpc_secure_hash_params += @attributes[key].to_s
         end
         if Digest::MD5.hexdigest(vpc_secure_hash_params).upcase == vpc_secure_hash
@@ -118,8 +118,8 @@ module BankAudi
         end
       end
 
-      def sort_keys(attributes)
-        attributes.keys.sort do |a,b|
+      def sort_keys(keys)
+        keys.sort do |a,b|
           size = [a.length, b.length].min
           compare = 0
           size.times do |i|
