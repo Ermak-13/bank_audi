@@ -96,8 +96,8 @@ module BankAudi
 
     private
       def valid_vpc_secure_hash?
-        params = @attributes.select { |k,v| v != vpc_secure_hash }
-        vpc_secure_hash_params = secret_code
+        params = @attributes.select { |k,v| !%w(vpc_secure_hash vpc_SecureHash).include?(k.to_s) }
+        vpc_secure_hash_params = @secret_code
         sort_keys(params.keys).each do |key|
           vpc_secure_hash_params += @attributes[key].to_s
         end
